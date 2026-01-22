@@ -1,4 +1,4 @@
-# Contributing to PipeSort
+# Contributing to PiedPiperSort
 
 Thanks for wanting to contribute — big or small, it all helps.
 
