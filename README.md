@@ -122,3 +122,8 @@ MIT License @ Matija Perovic
 Inspired by bitwise radix sorting techniques, optimized for multi-limb integers.
 Pipe Sort combines the efficiency of radix-style partitioning with adaptive skipping to achieve high performance on modern datasets.
 
+## Contributing
+Contributions are welcome!
+Please submit changes via Pull Requests — direct pushes to `main` are disabled.
+
+
