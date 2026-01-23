@@ -1,64 +1,110 @@
-# PiedPiperSort
-### Pipe Sort (Radix-Branch)
+# Pied Piper Sort or Pipe Sort
 
-**PiedPiperSort** is a high-performance sorting algorithm optimized for **wide integers**
-(128-bit, 256-bit, or larger).
+**Pipe Sort** is a high-performance, non-comparison sorting algorithm designed for **wide integers** (such as 128-bit, 256-bit, or multi-limb numbers).
 
-At its core is **Pipe Sort (Radix-Branch)** — an MSB-first, bitwise sorting strategy that
-guides numbers through “pipes” based on their bits, **skipping identical high bits**
-to avoid unnecessary work.
+Instead of comparing numbers against each other, Pipe Sort works by **examining bits from the most significant side**, grouping numbers step by step until the correct order naturally emerges.
 
-This approach is especially effective for **large datasets**, **multi-limb integers**,
-and **skewed distributions**, where traditional comparison-based sorting becomes costly.
+This makes it especially effective for:
+
+* Large integers (`u128`, cryptographic keys, hashes)
+* Datasets with shared prefixes or skewed distributions
+* Situations where comparison-based sorting becomes expensive
 
 ---
 
-## Features
+## How It Works (Intuition)
 
-- Adaptive **bitwise partitioning** (most-significant-bit first)
-- Designed for **128-bit and 256-bit integers** (multi-limb arrays)
-- Skips identical high bits for **reduced recursion**
-- Performs well on **random and skewed datasets**
-- Naturally **parallelizable** (independent pipes)
-- Fully **correct and benchmark-tested**
+Think of Pipe Sort as guiding numbers through a system of pipes:
+
+1. Look at the **current most significant bit** of all numbers
+2. Split them into two groups:
+
+   * Bit `0` → left pipe
+   * Bit `1` → right pipe
+3. If all numbers share the same bit, **skip it** and move on
+4. Repeat for the next bit, recursively
+5. Stop when groups are fully determined
+
+No direct comparisons are ever made — numbers are ordered purely by their binary structure.
+
+---
+
+## Key Features
+
+* **MSB-first bitwise partitioning**
+* **Adaptive bit skipping** for identical prefixes
+* **No comparisons** (comparison-free sorting)
+* Optimized for **multi-limb integers**
+* Cache-friendly memory access patterns
+* Works well on **random and skewed datasets**
+* Fully benchmarked and correctness-tested
 
 ---
 
 ## Time Complexity
 
-| Case | Complexity | Notes |
-|-----|------------|-------|
-| Worst case | **O(N × B)** | B = total number of bits |
-| Adaptive / best case | **O(N × L_actual)** | Only differing bits are examined |
-| Space | **O(B)** | Recursion depth + small buffers |
+Let:
 
-> Pipe Sort is linear in the number of bits examined, making it highly competitive
-> against `std::sort` for wide integers.
+* `n` = number of elements
+* `w` = number of bits per element (e.g. `128` for `u128`)
+* `k` = number of *effective* bits actually examined
 
----
+| Case         | Time Complexity                  |
+| ------------ | -------------------------------- |
+| Best case    | **O(n)** (large shared prefixes) |
+| Average case | **O(n · k)** with `k ≪ w`        |
+| Worst case   | **O(n · w)**                     |
 
-## Use Cases
-
-- Sorting **128-bit / 256-bit integers**
-- Cryptographic hashes and blockchain addresses
-- Large **multi-limb numeric datasets**
-- Data with **shared high bits** (IDs, timestamps, IP ranges)
-- Scientific computing and data analytics
+In practice, Pipe Sort often behaves close to **linear time** for real-world wide-integer data.
 
 ---
 
-## Installation
+## Space Complexity
 
-```bash
-git clone https://github.com/perke0/PiedPiperSort.git
-cd PiedPiperSort
-g++ -O3 -march=native main.cpp pipe_sort.cpp -o piedpipersort
-./piedpipersort
-```
+* Recursion depth: **O(w)** (or **O(1)** if iterative)
+* Auxiliary memory:
+
+  * In-place partitioning: **O(1)**
+  * Out-of-place partitioning: **O(n)**
+
+---
+
+## Comparison with Other Algorithms
+
+| Algorithm     | Time Complexity | Comparisons | Notes               |
+| ------------- | --------------- | ----------- | ------------------- |
+| `std::sort`   | O(n log n)      | Yes         | General-purpose     |
+| Radix (LSD)   | O(n · w)        | No          | Fixed passes        |
+| **Pipe Sort** | **O(n · k)**    | No          | Adaptive, MSB-first |
+| QuickSort     | O(n²) worst     | Yes         | Branch-heavy        |
+
+Pipe Sort excels when dealing with **wide integers** and datasets with meaningful binary structure.
+
+---
+
+## When to Use Pipe Sort
+
+Pipe Sort is a strong choice when:
+
+* Sorting `u128` or larger integer types
+* Working with cryptographic or hash-based keys
+* Data has shared prefixes or skewed distributions
+* Comparison cost dominates performance
+
+It is **not** intended as a universal replacement for `std::sort` on small primitive types.
+
+---
+
+## Status
+
+* Correctness verified
+* Benchmarked against `std::sort`
+* Implementations available in **C and C++**
+* Designed for extensibility (parallel versions possible)
 
 ---
 
 ## License
 
-Apache 2.0 License @ Matija Perovic
+See `LICENSE` file for details.
 
