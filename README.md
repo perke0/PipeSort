@@ -1,43 +1,45 @@
-# Pied Piper Sort or Pipe Sort
+# Pipe Sort
 
-**Pipe Sort** is a high-performance, non-comparison sorting algorithm designed for **wide integers** (such as 128-bit, 256-bit, or multi-limb numbers).
+**Pipe Sort** is a data-adaptive, comparison-free sorting algorithm designed for **wide integers** (128-bit and beyond). It is optimized for scenarios where traditional comparison-based sorting becomes expensive due to large key sizes and shared binary structure.
 
-Instead of comparing numbers against each other, Pipe Sort works by **examining bits from the most significant side**, grouping numbers step by step until the correct order naturally emerges.
-
-This makes it especially effective for:
-
-* Large integers (`u128`, cryptographic keys, hashes)
-* Datasets with shared prefixes or skewed distributions
-* Situations where comparison-based sorting becomes expensive
+Pipe Sort is **not** a universal replacement for `std::sort`. It is a **specialized algorithm** with clearly defined strengths, trade-offs, and use cases.
 
 ---
 
-## How It Works (Intuition)
+## Motivation
 
-Think of Pipe Sort as guiding numbers through a system of pipes:
+Modern systems increasingly rely on wide keys:
 
-1. Look at the **current most significant bit** of all numbers
-2. Split them into two groups:
+* Cryptographic hashes and keys
+* UUIDs and content-addressed identifiers
+* Big integers (256 / 512 / 1024+ bits)
 
-   * Bit `0` → left pipe
-   * Bit `1` → right pipe
-3. If all numbers share the same bit, **skip it** and move on
-4. Repeat for the next bit, recursively
-5. Stop when groups are fully determined
-
-No direct comparisons are ever made — numbers are ordered purely by their binary structure.
+For such data, the cost of comparisons grows with key width. Pipe Sort approaches sorting from a different angle: it orders elements by **bit structure**, not by repeated key comparisons.
 
 ---
 
-## Key Features
+## Core Idea (Intuition)
 
-* **MSB-first bitwise partitioning**
-* **Adaptive bit skipping** for identical prefixes
-* **No comparisons** (comparison-free sorting)
-* Optimized for **multi-limb integers**
-* Cache-friendly memory access patterns
-* Works well on **random and skewed datasets**
-* Fully benchmarked and correctness-tested
+Pipe Sort examines numbers **bit by bit**, starting from the most significant bit (MSB):
+
+1. Elements are partitioned by the current bit (`0` or `1`)
+2. If all elements share the same bit value, that bit is **skipped**
+3. The process continues recursively on the next bit
+
+This builds only the parts of a binary decision tree that are actually needed. The key insight is **prefix skipping**: identical high bits are never processed again.
+
+No element-to-element comparisons are performed.
+
+---
+
+## Key Properties
+
+* Comparison-free (bitwise partitioning only)
+* MSB-first processing
+* Data-adaptive via prefix skipping
+* Optimized for multi-limb integers
+* Predictable memory access patterns
+* Naturally extensible to arbitrarily wide keys
 
 ---
 
@@ -46,52 +48,111 @@ No direct comparisons are ever made — numbers are ordered purely by their bina
 Let:
 
 * `n` = number of elements
-* `w` = number of bits per element (e.g. `128` for `u128`)
-* `k` = number of *effective* bits actually examined
+* `w` = key width in bits
+* `k` = number of effective bit levels actually examined (`k ≤ w`)
 
-| Case         | Time Complexity                  |
+| Case         | Complexity                       |
 | ------------ | -------------------------------- |
 | Best case    | **O(n)** (large shared prefixes) |
 | Average case | **O(n · k)** with `k ≪ w`        |
 | Worst case   | **O(n · w)**                     |
 
-In practice, Pipe Sort often behaves close to **linear time** for real-world wide-integer data.
+Pipe Sort is **data-adaptive**: its runtime depends primarily on how much binary structure exists in the input.
 
 ---
 
-## Space Complexity
+## Space (Memory) Complexity
 
-* Recursion depth: **O(w)** (or **O(1)** if iterative)
-* Auxiliary memory:
+| Component             | Cost                             |
+| --------------------- | -------------------------------- |
+| In-place partitioning | **O(1)** auxiliary               |
+| Buffered partitioning | **O(n)** auxiliary               |
+| Recursion depth       | **O(w)** (or **O(1)** iterative) |
 
-  * In-place partitioning: **O(1)**
-  * Out-of-place partitioning: **O(n)**
+Memory usage is explicit and predictable.
 
 ---
 
-## Comparison with Other Algorithms
+## Performance Graphs
 
-| Algorithm     | Time Complexity | Comparisons | Notes               |
-| ------------- | --------------- | ----------- | ------------------- |
-| `std::sort`   | O(n log n)      | Yes         | General-purpose     |
-| Radix (LSD)   | O(n · w)        | No          | Fixed passes        |
-| **Pipe Sort** | **O(n · k)**    | No          | Adaptive, MSB-first |
-| QuickSort     | O(n²) worst     | Yes         | Branch-heavy        |
+### 1. Scaling with Input Size
 
-Pipe Sort excels when dealing with **wide integers** and datasets with meaningful binary structure.
+![Pipe Sort vs input size](graphs/compare_scaling_n.png)
+
+This graph shows how Pipe Sort scales as the number of elements increases.
+
+* Solid thick lines represent Pipe Sort (average and worst case)
+* `std::sort` is shown as a dot–dash baseline
+* Other algorithms are included as thin dashed references
+
+**Key takeaway:** Pipe Sort approaches linear behavior for many datasets while retaining a well-defined worst case.
+
+---
+
+### 2. Scaling with Key Width
+
+![Pipe Sort vs key width](graphs/compare_scaling_w.png)
+
+This graph illustrates how runtime scales as key width increases (128 → 4096+ bits).
+
+**Key takeaway:**
+
+* Pipe Sort’s average behavior can remain near **O(n·k)** due to prefix skipping
+* Worst-case behavior grows linearly with key width
+* The algorithm generalizes naturally beyond `u128`
+
+---
+
+### 3. Auxiliary Memory Usage
+
+![Auxiliary memory usage](graphs/compare_memory.png)
+
+This graph shows **auxiliary memory usage** (extra memory beyond the input array).
+
+* Pipe Sort can operate **in-place (O(1))** or **buffered (O(n))**
+* Other algorithms are shown for reference
+
+**Key takeaway:** Pipe Sort offers predictable and controllable memory usage.
+
+---
+
+## Comparison Summary
+
+| Algorithm     | Time (avg) | Time (worst) | Extra memory | Notes                                   |
+| ------------- | ---------- | ------------ | ------------ | --------------------------------------- |
+| **Pipe Sort** | O(n·k)     | O(n·w)       | O(1) / O(n)  | Best for wide keys with shared prefixes |
+| `std::sort`   | O(n log n) | O(n log n)   | O(log n)     | Strong general-purpose baseline         |
+| Radix Sort    | O(n·w)     | O(n·w)       | O(n)         | Fixed passes, not adaptive              |
+| QuickSort     | O(n log n) | O(n²)        | O(log n)     | Worst case possible                     |
 
 ---
 
 ## When to Use Pipe Sort
 
-Pipe Sort is a strong choice when:
-
 * Sorting `u128` or larger integer types
-* Working with cryptographic or hash-based keys
-* Data has shared prefixes or skewed distributions
-* Comparison cost dominates performance
+* Keys are expensive to compare
+* Data contains shared prefixes or duplicates
+* Predictable scaling is preferred
 
-It is **not** intended as a universal replacement for `std::sort` on small primitive types.
+## When *Not* to Use Pipe Sort
+
+* Small primitive types (`u32`, `u64`)
+* Very small input sizes
+* Adversarial inputs designed to defeat prefix skipping
+
+In such cases, `std::sort` is usually faster.
+
+---
+
+## Design Philosophy
+
+Pipe Sort prioritizes:
+
+* Clear cost models
+* Explicit trade-offs
+* Honest worst-case analysis
+
+It is designed as a **specialized tool**, not a universal solution.
 
 ---
 
@@ -99,12 +160,12 @@ It is **not** intended as a universal replacement for `std::sort` on small primi
 
 * Correctness verified
 * Benchmarked against `std::sort`
-* Implementations available in **C and C++**
-* Designed for extensibility (parallel versions possible)
+* Implemented in C and C++
+* Designed for extension to wider key sizes
 
 ---
 
 ## License
 
-See `LICENSE` file for details.
+See `LICENSE` for details.
 
