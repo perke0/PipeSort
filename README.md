@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="assets/pipe_sort_visual.png" alt="Pipe Sort visual flow" width="100%">
+</p>
+
+
 # Pipe Sort
 
 **Pipe Sort** is a data-adaptive, comparison-free sorting algorithm designed for **wide integers** (128-bit and beyond). It is optimized for scenarios where traditional comparison-based sorting becomes expensive due to large key sizes and shared binary structure.
@@ -77,7 +82,7 @@ Memory usage is explicit and predictable.
 
 ### 1. Scaling with Input Size
 
-![Pipe Sort vs input size](graphs/compare_scaling_n.png)
+![Pipe Sort vs input size](assets/graphs/compare_scaling_n.png)
 
 This graph shows how Pipe Sort scales as the number of elements increases.
 
@@ -91,7 +96,7 @@ This graph shows how Pipe Sort scales as the number of elements increases.
 
 ### 2. Scaling with Key Width
 
-![Pipe Sort vs key width](graphs/compare_scaling_w.png)
+![Pipe Sort vs key width](assets/graphs/compare_scaling_w.png)
 
 This graph illustrates how runtime scales as key width increases (128 → 4096+ bits).
 
@@ -105,7 +110,7 @@ This graph illustrates how runtime scales as key width increases (128 → 4096+ 
 
 ### 3. Auxiliary Memory Usage
 
-![Auxiliary memory usage](graphs/compare_memory.png)
+![Auxiliary memory usage](assets/graphs/compare_memory.png)
 
 This graph shows **auxiliary memory usage** (extra memory beyond the input array).
 
