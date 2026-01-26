@@ -15,6 +15,8 @@ add_library(pipesort_obj OBJECT
     internal/pipe_sort_u256_idx_radix8.c
     internal/pipe_sort_u512_idx_radix8.c
 )
+add_executable(bench_u128_qsort tests/bench_u128_qsort.c)
+target_link_libraries(bench_u128_qsort PRIVATE pipesort)
 
 target_include_directories(pipesort_obj PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -36,3 +38,4 @@ install(TARGETS pipesort
 )
 
 install(DIRECTORY include/pipesort/ DESTINATION include/pipesort FILES_MATCHING PATTERN "*.h")
+

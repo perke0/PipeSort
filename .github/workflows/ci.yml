@@ -1,33 +1,54 @@
-name: CI
+name: PipeSort CI
 
 on:
   push:
     branches: ["main"]
   pull_request:
     branches: ["main"]
+  workflow_dispatch: {}
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install deps
+      - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build gcc clang
+          sudo apt-get install -y cmake ninja-build gcc
 
       - name: Configure
-        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+        run: |
+          cmake -S . -B build \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
-        run: cmake --build build
-
-      - name: Run correctness (test_all)
         run: |
-          ./build/test_all 200000 123 | tee out.txt
-          # Fail if any sorter reports "sorted: NO"
-          ! grep -q "sorted: NO" out.txt
+          cmake --build build
+
+      - name: Verify sorted output (correct list)
+        run: |
+          ./build/test_all 200000 123 | tee result.txt
+
+          echo "Checking correctness..."
+          if grep -q "sorted: NO" result.txt; then
+            echo "❌ Sorting error detected"
+            exit 1
+          fi
+
+          if ! grep -q "sorted: YES" result.txt; then
+            echo "❌ No successful sort detected"
+            exit 1
+          fi
+
+          echo "✅ All lists sorted correctly"
+
+      - name: 5M benchmark vs qsort
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          ./build/bench_u128_qsort 5000000 123
 
