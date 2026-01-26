@@ -1,1 +1,0 @@
-/usr/bin/cc -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/bench_u128_qsort.dir/link.d CMakeFiles/bench_u128_qsort.dir/tests/bench_u128_qsort.c.o -o bench_u128_qsort  libpipesort.a

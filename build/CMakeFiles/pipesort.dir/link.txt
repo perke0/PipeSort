@@ -1,2 +1,0 @@
-/usr/bin/ar qc libpipesort.a CMakeFiles/pipesort_obj.dir/src/psort_u.c.o CMakeFiles/pipesort_obj.dir/src/psort_u128.c.o CMakeFiles/pipesort_obj.dir/src/psort_u256.c.o CMakeFiles/pipesort_obj.dir/src/psort_u512.c.o CMakeFiles/pipesort_obj.dir/internal/pipe_sort_u128.c.o CMakeFiles/pipesort_obj.dir/internal/pipe_sort_u256_idx_radix8.c.o CMakeFiles/pipesort_obj.dir/internal/pipe_sort_u512_idx_radix8.c.o
-/usr/bin/ranlib libpipesort.a
