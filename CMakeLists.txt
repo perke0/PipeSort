@@ -17,6 +17,8 @@ add_library(pipesort_obj OBJECT
 )
 add_executable(bench_u128_qsort tests/bench_u128_qsort.c)
 target_link_libraries(bench_u128_qsort PRIVATE pipesort)
+add_executable(test_all tests/test_all.c)
+target_link_libraries(test_all PRIVATE pipesort)
 
 target_include_directories(pipesort_obj PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include

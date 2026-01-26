@@ -1,0 +1,13 @@
+# ninja log v7
+3	100	1769460853060034657	CMakeFiles/pipesort_obj.dir/src/psort_u256.c.o	2648a769805266e9
+4	107	1769460853060546438	CMakeFiles/pipesort_obj.dir/src/psort_u512.c.o	7c4fb55eaec56586
+3	128	1769460853058492883	CMakeFiles/pipesort_obj.dir/src/psort_u128.c.o	461cb8b7910b128e
+7	212	1769460853063492904	CMakeFiles/test_all.dir/tests/test_all.c.o	687c239601cd453
+6	271	1769460853062611196	CMakeFiles/bench_u128_qsort.dir/tests/bench_u128_qsort.c.o	67152ecf9fcfba4b
+4	281	1769460853061056494	CMakeFiles/pipesort_obj.dir/internal/pipe_sort_u128.c.o	4b02c5334246194a
+2	296	1769460853057492879	CMakeFiles/pipesort_obj.dir/src/psort_u.c.o	37a3c37f15f44658
+5	320	1769460853061565211	CMakeFiles/pipesort_obj.dir/internal/pipe_sort_u256_idx_radix8.c.o	6d6dd42a473aebdc
+5	367	1769460853062043300	CMakeFiles/pipesort_obj.dir/internal/pipe_sort_u512_idx_radix8.c.o	9898a5b73a9100d5
+367	417	1769460853422494408	libpipesort.a	a99c331098df0462
+417	450	1769460853472494617	bench_u128_qsort	d16029e73ea7a395
+418	454	1769460853473494621	test_all	7ebb4ceb1aa6b258

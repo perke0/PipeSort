@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/mp/PipeSort/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
