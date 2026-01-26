@@ -24,21 +24,37 @@ jobs:
         run: |
           rm -rf build
 
-      - name: Configure
+      - name: Configure (Release)
         run: |
-          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake -S . -B build \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
         run: |
           cmake --build build
 
-          - name: Run correctness + compare to qsort
+      - name: Run correctness test (psort vs qsort)
         run: |
           TEST_ALL=$(find build -type f -executable -name test_all | head -n 1 || true)
+
           if [ -z "$TEST_ALL" ]; then
-            echo "test_all not found"
+            echo "test_all executable not found"
             find build -type f
             exit 1
           fi
+
           "$TEST_ALL" 5000000 123
+
+      - name: 5M benchmark vs qsort (manual only)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          BENCH=$(find build -type f -executable -name bench_u128_qsort | head -n 1 || true)
+
+          if [ -z "$BENCH" ]; then
+            echo "bench_u128_qsort executable not found"
+            exit 1
+          fi
+
+          "$BENCH" 5000000 123
 
